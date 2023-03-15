@@ -19,7 +19,8 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['*'],
+    // Autorizziamo uno o più URL da dove effettueremo le chiamate presa dall'env dove è stata creata come nuova chiave
+    'allowed_origins' => [env('APP_FRONTEND_URL')],
 
     'allowed_origins_patterns' => [],
 
