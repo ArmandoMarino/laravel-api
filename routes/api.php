@@ -19,5 +19,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-// Rotte API Projects
-Route::resource('projects', ProjectController::class);
+// Rotte API Projects con resources
+Route::apiResource('projects', ProjectController::class);
