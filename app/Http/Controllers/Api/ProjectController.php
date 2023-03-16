@@ -84,6 +84,6 @@ class ProjectController extends Controller
         }
 
 
-        return response()->json($projects);
+        return response()->json(compact('projects', 'type'));
     }
 }
