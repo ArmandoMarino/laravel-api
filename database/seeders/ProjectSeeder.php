@@ -25,7 +25,7 @@ class ProjectSeeder extends Seeder
 
         $technology_ids = Technology::select('id')->pluck('id')->toArray();
 
-        for ($i = 0; $i < 20; $i++) {
+        for ($i = 0; $i < 30; $i++) {
             $project = new Project();
 
             // Assegnamo un id random preso dal $type_ids sopra e lo seediamo
