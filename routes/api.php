@@ -21,3 +21,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 // Rotte API Projects con resources
 Route::apiResource('projects', ProjectController::class);
+
+
+//Rotta per il recupero dei projects appartenenti a un type
+
+Route::get('/types/{id}/projects', [ProjectController::class, 'typeProjectsIndex']);

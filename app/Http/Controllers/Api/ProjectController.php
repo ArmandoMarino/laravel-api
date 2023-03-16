@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Project;
+use App\Models\Type;
 use Illuminate\Http\Request;
 
 class ProjectController extends Controller
@@ -66,5 +67,23 @@ class ProjectController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+
+    public function typeProjectsIndex(string $id)
+    {
+        $type = Type::find($id);
+        if (!$type) return response(null, 404);
+
+        // Li prendo così perchè c'è la relzione tra i due
+        $projects = $type->projects;
+
+        // Giro sui projects per prendere l'immagine
+        foreach ($projects as $project) {
+            if ($project->image) $project->image = url('storage/' . $project->image);
+        }
+
+
+        return response()->json($projects);
     }
 }
