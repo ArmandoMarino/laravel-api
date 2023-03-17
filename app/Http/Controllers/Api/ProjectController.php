@@ -50,6 +50,11 @@ class ProjectController extends Controller
         // Funzione ->first() che prender il primo dalla collection
         $project = Project::where('slug', $slug)->with('type', 'technologies')->first();
         if (!$project) return response(null, 404);
+
+
+        if ($project->image) $project->image = url('storage/' . $project->image);
+
+
         return response()->json($project);
     }
 
