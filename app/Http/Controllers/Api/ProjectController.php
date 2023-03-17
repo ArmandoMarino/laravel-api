@@ -76,7 +76,7 @@ class ProjectController extends Controller
         if (!$type) return response(null, 404);
 
         // Li prendo così perchè c'è la relzione tra i due
-        $projects = $type->projects;
+        $projects = Project::with('type', 'technologies')->where('type_id', $id)->orderBy('updated_at', 'DESC')->paginate(5);
 
         // Giro sui projects per prendere l'immagine
         foreach ($projects as $project) {
