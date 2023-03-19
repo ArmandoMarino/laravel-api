@@ -23,6 +23,10 @@ use Illuminate\Support\Facades\Storage;
 // FOR VALIDATION UNIQUE IN UPDATE RULE
 use Illuminate\Validation\Rule;
 
+// MAIL
+use App\Mail\ProjectPublicationMail;
+use Illuminate\Support\Facades\Mail;
+
 class ProjectController extends Controller
 {
     /**
@@ -121,6 +125,21 @@ class ProjectController extends Controller
 
         $project->save();
 
+        //****** INVIO MAIL******
+        if ($project->is_published) {
+            $this->sendPublicationMail($project);
+
+            //*** */ A tutti gli utenti
+            // $email = new ProjectPublicationMail($project);
+            // $user_id = Auth::id();
+            // $user_emails = User::where('id', '<>', $user_id)->pluck('email')->toArray();
+            // foreach ($user_emails as $user_email)
+            //     var_dump($user_email);
+            // Mail::to($user_email)->send($email);
+        }
+
+
+
         // Releziono il project con i Technologies se esistono/arrivano in data  con attach!
         if (Arr::exists($data, 'technologies')) $project->technologies()->attach($data['technologies']);
 
@@ -157,6 +176,9 @@ class ProjectController extends Controller
      */
     public function update(Request $request, project $project)
     {
+        //** */ FLAG STATUS INIZIALE PER CONTROLLO DELLA MAIL
+        $initial_status = $project->is_published;
+
         $request->validate(
             [
                 // UNIQUE IN THE PROJECTS TABLE and IGNORE PROJECT ID
@@ -196,6 +218,20 @@ class ProjectController extends Controller
 
         $project->update($data);
 
+
+        //****** INVIO MAIL******
+        if ($initial_status !== $project->is_published) {
+            $this->sendPublicationMail($project);
+
+            //*** */ A tutti gli utenti
+            // $email = new ProjectPublicationMail($project);
+            // $user_id = Auth::id();
+            // $user_emails = User::where('id', '<>', $user_id)->pluck('email')->toArray();
+            // foreach ($user_emails as $user_email)
+            //     var_dump($user_email);
+            // Mail::to($user_email)->send($email);
+        }
+
         // Releziono il project con i Technologies se esistono/arrivano in data ma con sync !
         if (Arr::exists($data, 'technologies')) $project->technologies()->sync($data['technologies']);
         // Altrimenti se te li conto e ne hai (relazione tra $project->technologies) allora con il METODO ->technologies() le elimini ->detach();
@@ -231,7 +267,30 @@ class ProjectController extends Controller
 
         $project->save();
 
+        //? (MAIL) Se è stato pubblicato importo il mailable con il post passato dalla classe,
+        //? imposto l'istanza la useremail e invio la mail creata 
+        if ($project->is_published) {
+            // Funzione richiamata in fondo pagina
+            $this->sendPublicationMail($project);
+
+            //*** */ A tutti gli utenti
+            // $email = new ProjectPublicationMail($project);
+            // $user_id = Auth::id();
+            // $user_emails = User::where('id', '<>', $user_id)->pluck('email')->toArray();
+            // foreach ($user_emails as $user_email)
+            //     var_dump($user_email);
+            // Mail::to($user_email)->send($email);
+        }
+
         // redirect con messaggio e azione personalizzata
         return to_route('admin.projects.index')->with('type', 'success')->with('message', "The Project is $action");
+    }
+
+    //! FUNZIONE RICHIAMATA per mandare le mail
+    private function sendPublicationMail(Project $project)
+    {
+        $email = new ProjectPublicationMail($project);
+        $user_email = Auth::user()->email;
+        Mail::to($user_email)->send($email);
     }
 }
